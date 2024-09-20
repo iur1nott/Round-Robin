@@ -15,6 +15,27 @@ typedef struct {
     ProcessState state;
 } Process;
 
+char* returnStateStr(int estado) {
+    char *str;
+    switch (estado) {
+        case PRONTO:
+            str ="PRONTO";
+            break;
+        case EM_EXECUCAO:
+            str ="EM EXECUÇÃO";
+            break;
+        case BLOQUEADO:
+            str ="BLOQUEADO";
+            break;
+        case CONCLUIDO:
+            str ="CONCLUIDO";
+            break;
+        default:
+            str ="INCOGNOSCÍVEL";
+    }
+    return str;
+}
+
 // Função para escalonar processos usando o algoritmo FCFS
 void fcfs(Process processes[], int num_processes) {
     int current_time = 0;
@@ -23,20 +44,26 @@ void fcfs(Process processes[], int num_processes) {
         // Mudar o estado do processo para EM_EXECUCAO
         processes[i].state = EM_EXECUCAO;
 
-        printf("Tempo %d: Processo %d em execucao\n", current_time, processes[i].id);
+        printf("Tempo %d:\n", current_time);
 
+            // Mostra o estado de todos os processos
+            for (int j = 0; j < num_processes; j++) {
+                printf("\tProcesso %d: %s\n", processes[j].id,returnStateStr(processes[j].state));
+            }
+        current_time++;
+        printf("Tempo %d:\n", current_time);
+        printf("\tProcesso %d\n", processes[i].id);
         // Simular a execução do processo até a conclusão
         while (processes[i].time_remaining > 0) {
-            current_time++;
             processes[i].time_remaining--;
-
-            printf("Tempo %d: Processo %d - Tempo restante: %d\n", current_time, processes[i].id, processes[i].time_remaining);
+            printf("\t\tTempo restante: %d\n", processes[i].time_remaining);
+            current_time++;
         }
 
         // Mudar o estado do processo para CONCLUIDO
         processes[i].state = CONCLUIDO;
 
-        printf("Tempo %d: Processo %d concluido\n", current_time, processes[i].id);
+        printf("\t\tProcesso %d concluido\n", processes[i].id);
     }
 }
 
@@ -57,7 +84,7 @@ int main() {
     // Exibir o estado final dos processos
     printf("Estado final dos processos:\n");
     for (int i = 0; i < num_processes; i++) {
-        printf("Processo %d: Estado %d\n", processes[i].id, processes[i].state);
+        printf("\tProcesso %d estado: %s\n", processes[i].id, returnStateStr(processes[i].state));
     }
 
     return 0;
