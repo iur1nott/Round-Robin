@@ -1,49 +1,63 @@
-#include <stdlib.h>
 #include <stdio.h>
-#include "processo.h"
+#include <stdlib.h>
+
+typedef enum {
+    PRONTO,
+    EM_EXECUCAO,
+    BLOQUEADO,
+    CONCLUIDO
+} ProcessState;
+
+// Estrutura para representar um processo
+typedef struct {
+    int id;
+    int time_remaining;
+    ProcessState state;
+} Process;
+
+// Função para escalonar processos usando o algoritmo FCFS
+void fcfs(Process processes[], int num_processes) {
+    int current_time = 0;
+
+    for (int i = 0; i < num_processes; i++) {
+        // Mudar o estado do processo para EM_EXECUCAO
+        processes[i].state = EM_EXECUCAO;
+
+        printf("Tempo %d: Processo %d em execucao\n", current_time, processes[i].id);
+
+        // Simular a execução do processo até a conclusão
+        while (processes[i].time_remaining > 0) {
+            current_time++;
+            processes[i].time_remaining--;
+
+            printf("Tempo %d: Processo %d - Tempo restante: %d\n", current_time, processes[i].id, processes[i].time_remaining);
+        }
+
+        // Mudar o estado do processo para CONCLUIDO
+        processes[i].state = CONCLUIDO;
+
+        printf("Tempo %d: Processo %d concluido\n", current_time, processes[i].id);
+    }
+}
 
 int main() {
-    // Criação de alguns processos para a fila
-    Process* process1 = create_process(1, 5);
-    Process* process2 = create_process(2, 3);
-    Process* process3 = create_process(3, 8);
+    // Exemplo de utilização
+    Process processes[] = {
+        {1, 5, PRONTO},
+        {2, 3, PRONTO},
+        {3, 7, PRONTO}
+        // Adicione mais processos conforme necessário
+    };
 
-    // Fila de processos
-    Process* process_queue[] = {process1, process2, process3};
-    int num_processes = sizeof(process_queue) / sizeof(process_queue[0]);
+    int num_processes = sizeof(processes) / sizeof(processes[0]);
 
-    // Simulação de execução
-    for (int time_slice = 0; ; time_slice++) {
-        printf("\nTime Slice: %d\n", time_slice);
+    // Chamar a função de escalonamento FCFS
+    fcfs(processes, num_processes);
 
-        // Executa cada processo na fila
-        for (int i = 0; i < num_processes; i++) {
-            if (process_queue[i]->time_remaining > 0) {
-                execute_process(process_queue[i]);
-            } else {
-                printf("Process %d completed.\n", process_queue[i]->id);
-            }
-        }
-
-        // Verifica se todos os processos foram concluídos
-        int all_processes_completed = 1;
-        for (int i = 0; i < num_processes; i++) {
-            if (process_queue[i]->time_remaining > 0) {
-                all_processes_completed = 0;
-                break;
-            }
-        }
-
-        // Se todos os processos foram concluídos, encerra a simulação
-        if (all_processes_completed) {
-            printf("\nAll processes completed. Simulation finished.\n");
-            break;
-        }
-    }
-
-    // Libera a memória alocada para os processos
+    // Exibir o estado final dos processos
+    printf("Estado final dos processos:\n");
     for (int i = 0; i < num_processes; i++) {
-        free(process_queue[i]);
+        printf("Processo %d: Estado %d\n", processes[i].id, processes[i].state);
     }
 
     return 0;
